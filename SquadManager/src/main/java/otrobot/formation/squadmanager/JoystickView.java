@@ -14,8 +14,8 @@ import android.view.View;
  */
 public class JoystickView extends View implements View.OnTouchListener {
 
-    private final int radius = 160; // outer circle
-    private final int button_radius = 100;
+    private final int radius = 175; // outer circle
+    private final int button_radius = 90;
 
     private JoystickTouchListener touchListener;
     private Point innerCircleCenter;
@@ -31,7 +31,7 @@ public class JoystickView extends View implements View.OnTouchListener {
 
     @Override
     protected void onMeasure (int widthMeasureSpec, int heightMeasureSpec) {
-        int boundingBoxSize = radius * 2 + button_radius/2;
+        int boundingBoxSize = (radius + button_radius)*2;
         setMeasuredDimension(boundingBoxSize, boundingBoxSize);
         innerCircleCenter = new Point(getWidth()/2, getHeight()/2);
     }
@@ -44,6 +44,10 @@ public class JoystickView extends View implements View.OnTouchListener {
         int y = getHeight();
 
         Paint paint = new Paint();
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        canvas.drawCircle(x / 2, y / 2, radius, paint);
 
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.BLACK);
