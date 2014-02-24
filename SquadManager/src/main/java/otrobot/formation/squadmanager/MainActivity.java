@@ -15,7 +15,8 @@ public class MainActivity extends Activity {
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        NetworkFragment fragment = NetworkFragment.newInstance("192.168.0.13 ", 1337);
+        NetworkFragment fragment = NetworkFragment.newInstance(null, 0); // disables the network part
+//        NetworkFragment fragment = NetworkFragment.newInstance("192.168.0.13 ", 1337);
         fragmentTransaction.add(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
 

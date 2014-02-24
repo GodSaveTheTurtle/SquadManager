@@ -27,8 +27,6 @@ public class NetworkFragment extends Fragment {
 
     private Button btn;
 
-    private static boolean NETWORK_ENABLED = false;
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -47,7 +45,6 @@ public class NetworkFragment extends Fragment {
         return fragment;
     }
     public NetworkFragment() {
-        System.out.println("Creating network fragment");
         // Required empty public constructor
     }
 
@@ -62,8 +59,7 @@ public class NetworkFragment extends Fragment {
         dataQueue = new LinkedBlockingQueue<String>();
 
         try {
-            if (NETWORK_ENABLED)
-                networkTask = new NetworkTask(InetAddress.getByName(addr), port, dataQueue);
+            networkTask = new NetworkTask(InetAddress.getByName(addr), port, dataQueue);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -72,12 +68,12 @@ public class NetworkFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (NETWORK_ENABLED) networkTask.execute();
+        if (networkTask != null) networkTask.execute();
     }
 
     @Override
     public void onPause() {
-        if (NETWORK_ENABLED) networkTask.cancel(true);
+        if (networkTask != null) networkTask.cancel(true);
         super.onPause();
 
     }

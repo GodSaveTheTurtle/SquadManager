@@ -1,6 +1,7 @@
 package otrobot.formation.squadmanager;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -14,14 +15,24 @@ import android.view.View;
  */
 public class JoystickView extends View implements View.OnTouchListener {
 
+    private enum Axis {Horizontal, Vertical, Both};
+
     private final int radius = 175; // outer circle
     private final int button_radius = 90;
 
     private JoystickTouchListener touchListener;
     private Point innerCircleCenter;
+    private Axis axis;
+
 
     public JoystickView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+    }
+
+    public JoystickView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        TypedArray a = getContext().obtainStyledAttributes(attrs, new int[]{R.attr.axis});
+        axis = Axis.values()[a.getInt(0, 2)];
         setOnTouchListener(this);
     }
 
@@ -84,8 +95,8 @@ public class JoystickView extends View implements View.OnTouchListener {
             if (!isInCircle(x, y)) return false;
 
             // move inner circle
-            innerCircleCenter.x = (int)x;
-            innerCircleCenter.y = (int)y;
+            if (axis == Axis.Horizontal || axis == Axis.Both) innerCircleCenter.x = (int)x;
+            if (axis == Axis.Vertical || axis == Axis.Both) innerCircleCenter.y = (int)y;
             invalidate();
 
             if (touchListener != null) {
