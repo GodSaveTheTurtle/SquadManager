@@ -63,8 +63,10 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
     @Override
     protected void onCancelled(Void aVoid) {
         dataQueue.add(MSG_TERMINATE);
-        socket.close();
-        socket = null;
+        if (socket != null) {
+            socket.close();
+            socket = null;
+        }
         super.onCancelled(aVoid);
     }
 

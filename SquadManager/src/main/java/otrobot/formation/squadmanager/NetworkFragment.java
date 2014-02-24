@@ -93,7 +93,14 @@ public class NetworkFragment extends Fragment {
         ((JoystickView)v.findViewById(R.id.joystickLeft)).setTouchListener(new JoystickView.JoystickTouchListener() {
             @Override
             public void onTouch(float x, float y) {
-                dataQueue.add(String.format("Touch %f, %f\n", x, y));
+                dataQueue.add(String.format("Vertical %f, %f\n", x, y));
+            }
+        });
+
+        ((JoystickView)v.findViewById(R.id.joystickRight)).setTouchListener(new JoystickView.JoystickTouchListener() {
+            @Override
+            public void onTouch(float x, float y) {
+                dataQueue.add(String.format("Horizontal %f, %f\n", x, y));
             }
         });
         return v;
