@@ -1,7 +1,11 @@
 package otrobot.formation.squadmanager;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,9 +22,6 @@ public class NetworkFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_ADDR = "addr";
     private static final String ARG_PORT = "port";
-
-    private String addr;
-    private int port;
 
     private NetworkTask networkTask;
     private BlockingQueue<String> dataQueue;
@@ -44,25 +45,34 @@ public class NetworkFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     public NetworkFragment() {
         // Required empty public constructor
+    }
+
+    public void initNetwork(String addr, int port) {
+        Log.i(Constants.TAG, "initNetwork");
+
+        try {
+            networkTask = new NetworkTask(InetAddress.getByName(addr), port, dataQueue);
+        } catch (UnknownHostException e) {
+            Log.wtf(Constants.TAG, e);
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            addr = getArguments().getString(ARG_ADDR);
-            port = getArguments().getInt(ARG_PORT);
-        }
+        Log.i(Constants.TAG, "NF creation"); 
 
         dataQueue = new LinkedBlockingQueue<String>();
 
-        try {
-            networkTask = new NetworkTask(InetAddress.getByName(addr), port, dataQueue);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+        if (getArguments() != null) {
+            String addr = getArguments().getString(ARG_ADDR);
+            int port = getArguments().getInt(ARG_PORT);
+            initNetwork(addr, port);
         }
+
     }
 
     @Override
@@ -93,6 +103,7 @@ public class NetworkFragment extends Fragment {
         ((JoystickView)v.findViewById(R.id.joystickLeft)).setTouchListener(new JoystickView.JoystickTouchListener() {
             @Override
             public void onTouch(float x, float y) {
+                Log.i(Constants.TAG, "bleh1");
                 dataQueue.add(String.format("Vertical %f, %f\n", x, y));
             }
         });
@@ -100,10 +111,10 @@ public class NetworkFragment extends Fragment {
         ((JoystickView)v.findViewById(R.id.joystickRight)).setTouchListener(new JoystickView.JoystickTouchListener() {
             @Override
             public void onTouch(float x, float y) {
+                Log.i(Constants.TAG, "bleh2");
                 dataQueue.add(String.format("Horizontal %f, %f\n", x, y));
             }
         });
         return v;
     }
-
 }

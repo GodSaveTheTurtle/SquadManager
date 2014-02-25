@@ -1,6 +1,7 @@
 package otrobot.formation.squadmanager;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -38,12 +39,12 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
 
             while(running) {
                 String data = null;
-                System.out.println("Waiting for dataqueue");
+                Log.i(Constants.TAG, "Waiting for dataqueue");
                 data = dataQueue.take();
-                System.out.println("got something!");
+                Log.i(Constants.TAG, "got something!");
                 if (MSG_TERMINATE.equals(data)) running = false;
                 else {
-                    System.out.println("Sending: " + data);
+                    Log.d(Constants.TAG, "Sending: " + data);
                     byte[] buffer = data.getBytes();
                     socket.send(new DatagramPacket(buffer, buffer.length, url, port));
                 }
@@ -52,9 +53,9 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
             socket.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.wtf(Constants.TAG, e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.w(Constants.TAG, e);
         }
 
         return null;
