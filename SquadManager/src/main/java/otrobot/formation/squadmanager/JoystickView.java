@@ -20,6 +20,11 @@ public class JoystickView extends View implements View.OnTouchListener {
     private final int radius = 175; // outer circle
     private final int button_radius = 90;
 
+    /** The values returned to the touch listener will always be between + and - this value
+     * Currently would return percentages (0-100% speed, with the sign for the direction)
+     * */
+    private static final int NORMALIZATION_RANGE = 100;
+
     private JoystickTouchListener touchListener;
     private Point innerCircleCenter;
     private Axis axis;
@@ -85,6 +90,10 @@ public class JoystickView extends View implements View.OnTouchListener {
             innerCircleCenter.y = (int)getHeight()/2;
             invalidate();
 
+            if (touchListener != null) {
+                touchListener.onTouch(0, 0);
+            }
+
             return true;
         }
 
@@ -100,7 +109,8 @@ public class JoystickView extends View implements View.OnTouchListener {
             invalidate();
 
             if (touchListener != null) {
-                touchListener.onTouch(x, y);
+                int[] normDeltas = normalize(x, y);
+                touchListener.onTouch(normDeltas[0], normDeltas[1]);
             }
             return true;
 
@@ -110,7 +120,14 @@ public class JoystickView extends View implements View.OnTouchListener {
 
     }
 
+    private int[] normalize(float x, float y) {
+        int[] ret = new int[2];
+        ret[0] = Math.round(x * NORMALIZATION_RANGE / getWidth());
+        ret[1] = Math.round(y * NORMALIZATION_RANGE / getHeight());
+        return ret;
+    }
+
     public static interface JoystickTouchListener {
-        public void onTouch(float x, float y);
+        public void onTouch(int dx, int dy);
     }
 }

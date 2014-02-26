@@ -18,13 +18,17 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
-public class NetworkFragment extends Fragment {
+public class NetworkFragment extends Fragment implements NetworkTask.DataSource{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_ADDR = "addr";
     private static final String ARG_PORT = "port";
 
+    private String addr;
+    private int port;
+
     private NetworkTask networkTask;
-    private BlockingQueue<String> dataQueue;
+
+    private int[] axisDelta = new int[2];
 
     private Button btn;
 
@@ -50,26 +54,34 @@ public class NetworkFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public void initNetwork(String addr, int port) {
+    private void initNetwork(String addr, int port) {
         Log.i(Constants.TAG, "initNetwork");
 
         try {
-            networkTask = new NetworkTask(InetAddress.getByName(addr), port, dataQueue);
+            networkTask = new NetworkTask(InetAddress.getByName(addr), port, this);
         } catch (UnknownHostException e) {
             Log.wtf(Constants.TAG, e);
+        }
+    }
+
+    private void stopNetwork() {
+        if (networkTask != null) {
+            Log.d(Constants.TAG, "stopNetwork");
+            networkTask.cancel(true);
+            networkTask = null;
+        } else {
+            Log.d(Constants.TAG, "network already stopped");
         }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(Constants.TAG, "NF creation"); 
-
-        dataQueue = new LinkedBlockingQueue<String>();
+        Log.i(Constants.TAG, "NF creation");
 
         if (getArguments() != null) {
-            String addr = getArguments().getString(ARG_ADDR);
-            int port = getArguments().getInt(ARG_PORT);
+            addr = getArguments().getString(ARG_ADDR);
+            port = getArguments().getInt(ARG_PORT);
             initNetwork(addr, port);
         }
 
@@ -83,7 +95,7 @@ public class NetworkFragment extends Fragment {
 
     @Override
     public void onPause() {
-        if (networkTask != null) networkTask.cancel(true);
+       stopNetwork();
         super.onPause();
 
     }
@@ -97,24 +109,41 @@ public class NetworkFragment extends Fragment {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dataQueue.add("Bleh");
+                Log.i(Constants.TAG, "Touched");
+                if (addr == null) Log.w(Constants.TAG, "No server address provided");
+                else if (networkTask == null) {
+                    initNetwork(addr, port);
+                    networkTask.execute();
+                } else {
+                    stopNetwork();
+                }
             }
         });
         ((JoystickView)v.findViewById(R.id.joystickLeft)).setTouchListener(new JoystickView.JoystickTouchListener() {
             @Override
-            public void onTouch(float x, float y) {
-                Log.i(Constants.TAG, "bleh1");
-                dataQueue.add(String.format("Vertical %f, %f\n", x, y));
+            public void onTouch(int x, int y) {
+                Log.i(Constants.TAG, "Vertical: " + y);
+                axisDelta[1] = y;
             }
         });
 
         ((JoystickView)v.findViewById(R.id.joystickRight)).setTouchListener(new JoystickView.JoystickTouchListener() {
             @Override
-            public void onTouch(float x, float y) {
-                Log.i(Constants.TAG, "bleh2");
-                dataQueue.add(String.format("Horizontal %f, %f\n", x, y));
+            public void onTouch(int x, int y) {
+                Log.i(Constants.TAG, "Horizontal: " + x);
+                axisDelta[0] = x;
             }
         });
         return v;
+    }
+
+    @Override
+    public String getData() {
+        return String.format("%d %d", axisDelta[0], axisDelta[1]);
+    }
+
+    @Override
+    public int[] getIntData() {
+        return axisDelta;
     }
 }

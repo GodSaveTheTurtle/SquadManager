@@ -8,6 +8,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -19,15 +23,16 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
     private DatagramSocket socket;
     private InetAddress url;
     private int port;
-    private BlockingQueue<String> dataQueue;
     boolean running;
     public static final String MSG_TERMINATE = "TERMINATE";
+    private DataSource dataSource;
+    private long SEND_INTERVAL_MILLIS = 100;
 
-    public NetworkTask(InetAddress url, int port, BlockingQueue<String> data) {
+    public NetworkTask(InetAddress url, int port, DataSource dataSource) {
         System.out.println("Creating network task");
         this.url = url;
         this.port = port;
-        this.dataQueue = data;
+        this.dataSource = dataSource;
 
     }
 
@@ -38,16 +43,17 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
             socket = new DatagramSocket();
 
             while(running) {
-                String data = null;
-                Log.i(Constants.TAG, "Waiting for dataqueue");
-                data = dataQueue.take();
-                Log.i(Constants.TAG, "got something!");
-                if (MSG_TERMINATE.equals(data)) running = false;
-                else {
-                    Log.d(Constants.TAG, "Sending: " + data);
-                    byte[] buffer = data.getBytes();
-                    socket.send(new DatagramPacket(buffer, buffer.length, url, port));
-                }
+                /*int[] data = dataSource.getIntData();
+                Log.d(Constants.TAG, "Sending: " + Arrays.toString(data));
+                byte[] buffer = intsToBytes(data);*/
+
+                String data = dataSource.getData();
+                Log.d(Constants.TAG, "Sending: " + data);
+                byte[] buffer = data.getBytes();
+
+                socket.send(new DatagramPacket(buffer, buffer.length, url, port));
+                // todo flush socket?
+                Thread.sleep(SEND_INTERVAL_MILLIS);
             }
 
             socket.close();
@@ -55,7 +61,7 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
         } catch (IOException e) {
             Log.wtf(Constants.TAG, e);
         } catch (InterruptedException e) {
-            Log.w(Constants.TAG, e);
+            Log.w(Constants.TAG, "Network Task interrupted");
         }
 
         return null;
@@ -63,7 +69,7 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
 
     @Override
     protected void onCancelled(Void aVoid) {
-        dataQueue.add(MSG_TERMINATE);
+        running = false;
         if (socket != null) {
             socket.close();
             socket = null;
@@ -75,5 +81,18 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
     protected void onProgressUpdate(Void... values) {
         // TODO: update the Kinect view here?
         super.onProgressUpdate(values);
+    }
+
+    public static byte[] intsToBytes(int[] ints) {
+        ByteBuffer bb = ByteBuffer.allocate(ints.length * 4);
+        IntBuffer fb = bb.asIntBuffer();
+        for (int f : ints) fb.put(f);
+        return bb.array();
+    }
+
+    /** Used to retrieve the data to send on the network */
+    public static interface DataSource {
+        String getData();
+        int[] getIntData();
     }
 }
