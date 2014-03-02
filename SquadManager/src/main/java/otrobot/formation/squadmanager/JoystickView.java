@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -49,6 +50,7 @@ public class JoystickView extends View implements View.OnTouchListener {
     protected void onMeasure (int widthMeasureSpec, int heightMeasureSpec) {
         int boundingBoxSize = (radius + button_radius)*2;
         setMeasuredDimension(boundingBoxSize, boundingBoxSize);
+        Log.d(Constants.TAG, String.format("Joystick dimensions: %dx%d", getWidth(), getHeight()));
         innerCircleCenter = new Point(getWidth()/2, getHeight()/2);
     }
 
@@ -104,8 +106,8 @@ public class JoystickView extends View implements View.OnTouchListener {
             if (!isInCircle(x, y)) return false;
 
             // move inner circle
-            if (axis == Axis.Horizontal || axis == Axis.Both) innerCircleCenter.x = (int)x;
-            if (axis == Axis.Vertical || axis == Axis.Both) innerCircleCenter.y = (int)y;
+            if (axis == Axis.Horizontal || axis == Axis.Both) innerCircleCenter.x = Math.round(x);
+            if (axis == Axis.Vertical || axis == Axis.Both) innerCircleCenter.y = Math.round(y);
             invalidate();
 
             if (touchListener != null) {
@@ -122,8 +124,19 @@ public class JoystickView extends View implements View.OnTouchListener {
 
     private int[] normalize(float x, float y) {
         int[] ret = new int[2];
-        ret[0] = Math.round(x * NORMALIZATION_RANGE / getWidth());
-        ret[1] = Math.round(y * NORMALIZATION_RANGE / getHeight());
+
+        Log.d(Constants.TAG, String.format("Before projection change: (%f,%f)", x, y));
+
+        // Projection change: consider the origin to be the center of the joystick now
+        x -= getWidth()/2;
+        y = -(y - getHeight()/2);
+        Log.d(Constants.TAG, String.format("After projection change: (%f,%f)", x, y));
+
+        ret[0] = Math.round(x * NORMALIZATION_RANGE / radius);
+        ret[1] = Math.round(y * NORMALIZATION_RANGE / radius);
+
+        Log.d(Constants.TAG, String.format("After normalization: (%d,%d)", ret[0], ret[1]));
+
         return ret;
     }
 

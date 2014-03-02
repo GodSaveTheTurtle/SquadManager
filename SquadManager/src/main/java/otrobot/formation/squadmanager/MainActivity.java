@@ -15,7 +15,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            Fragment newFragment = NetworkFragment.newInstance("192.168.43.197", 1337);
+//            Fragment newFragment = NetworkFragment.newInstance("192.168.43.197", 1337);
+            Fragment newFragment = new NetworkFragment();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.root_layout, newFragment).commit();
         }
