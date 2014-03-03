@@ -7,29 +7,24 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by nicolas on 2/21/14.
  */
-public class NetworkTask extends AsyncTask<Void, Void, Void>{
+public class NetworkTask extends AsyncTask<Void, Void, Void> {
 
 
     private DatagramSocket socket;
     private InetAddress url;
     private int port;
     boolean running;
-    public static final String MSG_TERMINATE = "TERMINATE";
     private DataSource dataSource;
     private long SEND_INTERVAL_MILLIS = 100;
 
     public NetworkTask(InetAddress url, int port, DataSource dataSource) {
-        System.out.println("Creating network task");
+        Log.i(Constants.TAG, "Creating network task");
         this.url = url;
         this.port = port;
         this.dataSource = dataSource;
@@ -42,7 +37,7 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
         try {
             socket = new DatagramSocket();
 
-            while(running) {
+            while (running) {
                 /*int[] data = dataSource.getIntData();
                 Log.d(Constants.TAG, "Sending: " + Arrays.toString(data));
                 byte[] buffer = intsToBytes(data);*/
@@ -90,9 +85,12 @@ public class NetworkTask extends AsyncTask<Void, Void, Void>{
         return bb.array();
     }
 
-    /** Used to retrieve the data to send on the network */
+    /**
+     * Used to retrieve the data to send on the network
+     */
     public static interface DataSource {
         String getData();
+
         int[] getIntData();
     }
 }

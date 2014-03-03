@@ -16,14 +16,15 @@ import android.view.View;
  */
 public class JoystickView extends View implements View.OnTouchListener {
 
-    private enum Axis {Horizontal, Vertical, Both};
+    private enum Axis {Horizontal, Vertical, Both}
 
     private final int radius = 175; // outer circle
     private final int button_radius = 90;
 
-    /** The values returned to the touch listener will always be between + and - this value
+    /**
+     * The values returned to the touch listener will always be between + and - this value
      * Currently would return percentages (0-100% speed, with the sign for the direction)
-     * */
+     */
     private static final int NORMALIZATION_RANGE = 100;
 
     private JoystickTouchListener touchListener;
@@ -47,11 +48,11 @@ public class JoystickView extends View implements View.OnTouchListener {
     }
 
     @Override
-    protected void onMeasure (int widthMeasureSpec, int heightMeasureSpec) {
-        int boundingBoxSize = (radius + button_radius)*2;
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int boundingBoxSize = (radius + button_radius) * 2;
         setMeasuredDimension(boundingBoxSize, boundingBoxSize);
         Log.d(Constants.TAG, String.format("Joystick dimensions: %dx%d", getWidth(), getHeight()));
-        innerCircleCenter = new Point(getWidth()/2, getHeight()/2);
+        innerCircleCenter = new Point(getWidth() / 2, getHeight() / 2);
     }
 
     @Override
@@ -77,8 +78,8 @@ public class JoystickView extends View implements View.OnTouchListener {
     }
 
     public boolean isInCircle(float xTouch, float yTouch) {
-        float x = getWidth()/2;
-        float y = getHeight()/2;
+        float x = getWidth() / 2;
+        float y = getHeight() / 2;
         return (xTouch - x) * (xTouch - x) + (yTouch - y) * (yTouch - y) <= radius * radius;
     }
 
@@ -88,8 +89,8 @@ public class JoystickView extends View implements View.OnTouchListener {
         int action = motionEvent.getActionMasked();
 
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            innerCircleCenter.x = (int)getWidth()/2;
-            innerCircleCenter.y = (int)getHeight()/2;
+            innerCircleCenter.x = getWidth() / 2;
+            innerCircleCenter.y = getHeight() / 2;
             invalidate();
 
             if (touchListener != null) {
@@ -128,8 +129,8 @@ public class JoystickView extends View implements View.OnTouchListener {
         Log.d(Constants.TAG, String.format("Before projection change: (%f,%f)", x, y));
 
         // Projection change: consider the origin to be the center of the joystick now
-        x -= getWidth()/2;
-        y = -(y - getHeight()/2);
+        x = -(x - getWidth() / 2);
+        y = -(y - getHeight() / 2);
         Log.d(Constants.TAG, String.format("After projection change: (%f,%f)", x, y));
 
         ret[0] = Math.round(x * NORMALIZATION_RANGE / radius);
