@@ -126,12 +126,12 @@ public class JoystickView extends View implements View.OnTouchListener {
     private int[] normalize(float x, float y) {
         int[] ret = new int[2];
 
-        Log.d(Constants.TAG, String.format("Before projection change: (%f,%f)", x, y));
+        Log.v(Constants.TAG, String.format("Before projection change: (%f,%f)", x, y));
 
         // Projection change: consider the origin to be the center of the joystick now
         x = -(x - getWidth() / 2);
         y = -(y - getHeight() / 2);
-        Log.d(Constants.TAG, String.format("After projection change: (%f,%f)", x, y));
+        Log.v(Constants.TAG, String.format("After projection change: (%f,%f)", x, y));
 
         ret[0] = Math.round(x * NORMALIZATION_RANGE / radius);
         ret[1] = Math.round(y * NORMALIZATION_RANGE / radius);

@@ -1,13 +1,14 @@
 package otrobot.formation.squadmanager;
 
 import android.app.Fragment;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -18,27 +19,17 @@ public class NetworkFragment extends Fragment implements NetworkTask.DataSource 
     private static final String ARG_ADDR = "defaultAddr";
     private static final String ARG_PORT = "defaultPort";
 
-    private String defaultAddr;
-    private int defaultPort;
+    private String address;
+    private int directionPort;
+    private int slavePort;
 
     private NetworkTask networkTask;
 
     private int[] axisDelta = new int[2];
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param addr Parameter 1.
-     * @param port Parameter 2.
-     * @return A new instance of fragment NetworkFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NetworkFragment newInstance(String addr, int port) {
+    public static NetworkFragment newInstance() {
         NetworkFragment fragment = new NetworkFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_ADDR, addr);
-        args.putInt(ARG_PORT, port);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,18 +65,18 @@ public class NetworkFragment extends Fragment implements NetworkTask.DataSource 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(Constants.TAG, "NF creation");
-
-        if (getArguments() != null) {
-            defaultAddr = getArguments().getString(ARG_ADDR);
-            defaultPort = getArguments().getInt(ARG_PORT);
-        }
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        address = p.getString(getString(R.string.pref_addr_key), getString(R.string.pref_addr_default));
+        directionPort = Integer.parseInt(p.getString(getString(R.string.pref_dirPort_key), getString(R.string.pref_dirPort_default)));
+        slavePort = Integer.parseInt(p.getString(getString(R.string.pref_slavePort_key), getString(R.string.pref_slavePort_default)));
+
+        initNetwork(address, directionPort);
         if (networkTask != null) networkTask.execute();
     }
 
@@ -102,39 +93,20 @@ public class NetworkFragment extends Fragment implements NetworkTask.DataSource 
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_network, container, false);
 
-        // Set the default address
-        final EditText addressField = (EditText) v.findViewById(R.id.editIP);
-        addressField.setText(String.format("%s:%d", defaultAddr, defaultPort));
-
-        // Initialize the button
+        // Initialize the network button
         final Button btn = (Button) v.findViewById(R.id.btn);
         updateText(btn);
-        btn.setOnClickListener(new View.OnClickListener() {
+        btn.setOnClickListener(new NetworkToggleListener(btn));
+
+        final Button btnObstacle = (Button) v.findViewById(R.id.obstacleToggle);
+        btnObstacle.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                Log.i(Constants.TAG, "Touched");
 
-                String addr;
-                int port;
-
-                if (addressField.getText().toString() != null) {
-                    String[] tmp = addressField.getText().toString().split(":");
-                    addr = tmp[0];
-                    port = tmp.length > 1 ? Integer.getInteger(tmp[1], defaultPort) : defaultPort;
-                } else {
-                    addr = defaultAddr;
-                    port = defaultPort;
-                }
-                if (networkTask == null) {
-                    if (initNetwork(addr, port))
-                        networkTask.execute();
-                } else {
-                    stopNetwork();
-                }
-                updateText(btn);
             }
         });
+
 
         ((JoystickView) v.findViewById(R.id.joystickLeft)).setTouchListener(new JoystickView.JoystickTouchListener() {
             @Override
@@ -149,6 +121,7 @@ public class NetworkFragment extends Fragment implements NetworkTask.DataSource 
                 axisDelta[1] = x;
             }
         });
+
         return v;
     }
 
@@ -168,5 +141,27 @@ public class NetworkFragment extends Fragment implements NetworkTask.DataSource 
     @Override
     public int[] getIntData() {
         return axisDelta;
+    }
+
+    private class NetworkToggleListener implements View.OnClickListener {
+
+        private final Button btn;
+
+        private NetworkToggleListener(Button btn) {
+            this.btn = btn;
+        }
+
+        @Override
+        public void onClick(View view) {
+            Log.i(Constants.TAG, "Touched");
+
+            if (networkTask == null) {
+                if (initNetwork(address, directionPort))
+                    networkTask.execute();
+            } else {
+                stopNetwork();
+            }
+            updateText(btn);
+        }
     }
 }

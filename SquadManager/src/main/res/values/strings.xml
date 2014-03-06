@@ -10,5 +10,24 @@
     <string name="connect">Connect</string>
     <string name="placeholder_ip">Server IP</string>
     <string name="disconnect">Disconnect</string>
+    <string name="decrementSlaveCount">+ Slave</string>
+    <string name="incrementSlaveCount">- Slave</string>
+    <string name="obstacleAdd">+ Obstacle</string>
+    <string name="obstacleRemove">- Obstacle</string>
+    <string name="settings_connection">Connection Settings</string>
+    <string name="settings_directionPort">Direction Control Port</string>
+    <string name="settings_slavePort">Slave  Port</string>
+    <string name="pref_addr_key">pref_addr</string>
+    <string name="pref_addr_title">Server Address</string>
+    <string name="pref_cat_connection_title">Connection Settings</string>
+    <string name="pref_dirPort_key">dirPort</string>
+    <string name="pref_dirPort_title">Direction Port</string>
+    <string name="pref_slavePort_key">pref_slavePort</string>
+    <string name="pref_slavePort_title">Slave Port</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="pref_addr_default">127.0.0.1</string>
+    <string name="pref_dirPort_default">1337</string>
+    <string name="pref_slavePort_default">1338</string>
 
 </resources>

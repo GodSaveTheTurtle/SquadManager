@@ -10,9 +10,6 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-/**
- * Created by nicolas on 2/21/14.
- */
 public class NetworkTask extends AsyncTask<Void, Void, Void> {
 
 
@@ -24,7 +21,7 @@ public class NetworkTask extends AsyncTask<Void, Void, Void> {
     private long SEND_INTERVAL_MILLIS = 100;
 
     public NetworkTask(InetAddress url, int port, DataSource dataSource) {
-        Log.i(Constants.TAG, "Creating network task");
+        Log.i(Constants.TAG, String.format("Creating network task targeting %s:%d", url.getHostAddress(), port));
         this.url = url;
         this.port = port;
         this.dataSource = dataSource;

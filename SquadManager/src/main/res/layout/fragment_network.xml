@@ -9,23 +9,34 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:layout_height="fill_parent">
+
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/connect"
             android:id="@+id/btn"
-            />
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
-        <EditText
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder_ip"
-            android:id="@+id/editIP"
+            android:id="@+id/slaveCount"
+            android:text="@string/decrementSlaveCount"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/btn" />
+            android:layout_toLeftOf="@+id/obstacleToggle" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/obstacleToggle"
+            android:text="@string/obstacleAdd"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
         <otrobot.formation.squadmanager.JoystickView
             android:id="@+id/joystickLeft"

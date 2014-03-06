@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_cat_connection_title">
+
+        <EditTextPreference
+            android:key="@string/pref_addr_key"
+            android:title="@string/pref_addr_title"
+            android:defaultValue="@string/pref_addr_default" />
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="@string/pref_dirPort_key"
+            android:title="@string/pref_dirPort_title"
+            android:defaultValue="@integer/pref_dirPort_default" />
+
+
+        <EditTextPreference
+            android:inputType="number"
+            android:key="@string/pref_slavePort_key"
+            android:title="@string/pref_slavePort_title"
+            android:defaultValue="@integer/pref_slavePort_default" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
